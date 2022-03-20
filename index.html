@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <script src=".\qwebchannel.js"></script>
+
     <title>下属行政区查询</title>
     <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
     <style type="text/css">
@@ -34,11 +36,31 @@
         <select id='street' style="width:100px" onchange='setCenter(this)'></select>
     </div>
 </div>
-<script type="text/javascript">
-        window._AMapSecurityConfig = {
-            securityJsCode:a2beda4404a4c8c1170ae32d3a18d9a0,
-        }
-</script>
+
+<script>
+ 	new QWebChannel(qt.webChannelTransport, function (channel) {
+        window.pyjs = channel.objects.testObject;    //把对象赋值到JS中
+    });
+ 	function show(){
+ 		alert(waitingMessage);
+ 	}
+	var waitingMessage=null;//等待接收python传来的数据
+	var message2py="message from js";//向python发送的数据
+	function sentBack(){
+		pyjs.testJS2Py(message2py);
+	}
+	function sent(){
+		try{
+			var get=1;
+			get=pyjs.testPy2JS();
+			alert(get);
+		}catch(e){
+			alert(e);
+		}
+
+	}
+ </script>
+
 <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=3ddcf69efa4d0e0b0751f45d85c54672&plugin=AMap.DistrictSearch"></script>
 
 <script type="text/javascript">
@@ -78,7 +100,7 @@
             }
             map.setFitView();//地图自适应
         }
-       
+
         //清空下一级别的下拉列表
         if (level === 'province') {
             citySelect.innerHTML = '';
@@ -90,7 +112,7 @@
         } else if (level === 'district') {
             areaSelect.innerHTML = '';
         }
-    
+
         var subList = data.districtList;
         if (subList) {
             var contentSub = new Option('--请选择--');
@@ -108,7 +130,7 @@
                 curList.add(contentSub);
             }
         }
-        
+
     }
     function search(obj) {
         //清除地图上所有覆盖物
